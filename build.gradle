@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'ru.vddmit'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+    runtimeOnly 'org.postgresql:postgresql:42.7.2'
+    compileOnly group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.1'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
+    implementation 'org.slf4j:slf4j-simple:2.0.16'
+
+
+}
+
+war {
+    archiveFileName = 'coffee-shop.war'
+    destinationDirectory = file("$buildDir/libs")
+}
+
+test {
+    useJUnitPlatform()
+}
