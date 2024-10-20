@@ -7,6 +7,7 @@ import ru.vddmit.model.OrderItem;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     private final CustomerRepository customerRepository;
 
     @Override
-    public void addOrder(Order order) {
+    public void save(Order order) {
         String sql = "INSERT INTO orders (customer_id) VALUES (?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setLong(1, order.getCustomer().getId());
@@ -34,7 +35,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Order getOrderById(long id) {
+    public Order findById(Long id) {
         String sql = "SELECT * FROM orders WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
@@ -51,7 +52,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<Order> getAllOrders() {
+    public List<Order> findAll() {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders";
         try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
@@ -68,7 +69,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public void deleteOrder(long id) {
+    public void delete(Long id) {
         String sql = "DELETE FROM orders WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
@@ -78,4 +79,37 @@ public class OrderRepositoryImpl implements OrderRepository {
             throw new RuntimeException("Failed to delete order with ID " + id, e);
         }
     }
+
+    @Override
+    public List<Order> findOrdersByIds(List<Long> orderIds) {
+        if (orderIds == null || orderIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        String sql = "SELECT * FROM orders WHERE id IN (" +
+                     String.join(", ", Collections.nCopies(orderIds.size(), "?")) + ")";
+
+        List<Order> orders = new ArrayList<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            for (int i = 0; i < orderIds.size(); i++) {
+                preparedStatement.setLong(i + 1, orderIds.get(i));
+            }
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    long orderId = resultSet.getLong("id");
+                    long customerId = resultSet.getLong("customer_id");
+                    Customer customer = customerRepository.findById(customerId);
+                    List<OrderItem> items = orderItemRepository.getOrderItemsByOrderId(orderId);
+
+                    orders.add(new Order(orderId, customer, items));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching orders by IDs: " + orderIds, e);
+        }
+
+        return orders;
+    }
+
+
 }

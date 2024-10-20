@@ -4,12 +4,7 @@ import ru.vddmit.model.Order;
 
 import java.util.List;
 
-public interface OrderRepository {
-    void addOrder(Order order);
+public interface OrderRepository extends CrudRepository<Order> {
 
-    Order getOrderById(long id);
-
-    List<Order> getAllOrders();
-
-    void deleteOrder(long id);
+    List<Order> findOrdersByIds(List<Long> orderIds);
 }

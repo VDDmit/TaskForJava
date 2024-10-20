@@ -11,23 +11,23 @@ public class CoffeeService {
     private final CoffeeRepository coffeeRepository;
 
     public void addCoffee(Coffee coffee) {
-        coffeeRepository.addCoffee(coffee);
+        coffeeRepository.save(coffee);
     }
 
     public Coffee getCoffeeById(long id) {
-        return coffeeRepository.getCoffeeById(id);
+        return coffeeRepository.findById(id);
     }
 
     public List<Coffee> getAllCoffees() {
-        return coffeeRepository.getAllCoffees();
+        return coffeeRepository.findAll();
     }
 
     public void updateCoffee(Coffee coffee) {
-        coffeeRepository.updateCoffee(coffee);
+        coffeeRepository.update(coffee);
     }
 
     public void deleteCoffee(long id) {
-        coffeeRepository.deleteCoffee(id);
+        coffeeRepository.delete(id);
     }
 
 }

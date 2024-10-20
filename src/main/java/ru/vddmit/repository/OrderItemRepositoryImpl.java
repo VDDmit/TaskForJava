@@ -34,7 +34,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
             preparedStatement.setLong(1, orderId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Coffee coffee = coffeeRepository.getCoffeeById(resultSet.getLong("coffee_id"));
+                Coffee coffee = coffeeRepository.findById(resultSet.getLong("coffee_id"));
                 items.add(new OrderItem(coffee, resultSet.getInt("quantity")));
             }
         } catch (SQLException e) {

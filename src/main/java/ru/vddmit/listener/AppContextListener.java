@@ -12,6 +12,8 @@ import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.vddmit.service.CoffeeService;
+import ru.vddmit.service.CustomerService;
 import ru.vddmit.service.OrderService;
 
 @WebListener
@@ -28,15 +30,23 @@ public class AppContextListener implements ServletContextListener {
             CustomerRepository customerRepository = new CustomerRepositoryImpl(connection);
             OrderItemRepository orderItemRepository = new OrderItemRepositoryImpl(connection, coffeeRepository);
             OrderRepository orderRepository = new OrderRepositoryImpl(connection, orderItemRepository, customerRepository);
-            OrderService orderService = new OrderService(orderRepository);
 
+            // Инициализация сервисов
+            OrderService orderService = new OrderService(orderRepository);
+            CustomerService customerService = new CustomerService(customerRepository, orderRepository);
+            CoffeeService coffeeService = new CoffeeService(coffeeRepository);
+
+            // Сохранение репозиториев и сервисов в контексте
             sce.getServletContext().setAttribute("coffeeRepository", coffeeRepository);
             sce.getServletContext().setAttribute("customerRepository", customerRepository);
             sce.getServletContext().setAttribute("orderItemRepository", orderItemRepository);
             sce.getServletContext().setAttribute("orderRepository", orderRepository);
-            sce.getServletContext().setAttribute("orderService", orderService);
 
-            logger.info("All repositories initialized and stored in the context.");
+            sce.getServletContext().setAttribute("orderService", orderService);
+            sce.getServletContext().setAttribute("customerService", customerService);
+            sce.getServletContext().setAttribute("coffeeService", coffeeService);
+
+            logger.info("All repositories and services initialized and stored in the context.");
         } catch (SQLException e) {
             logger.error("Failed to initialize database connection", e);
             sce.getServletContext().setAttribute("dbError", e.getMessage());

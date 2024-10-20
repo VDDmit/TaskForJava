@@ -11,18 +11,18 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     public void createOrder(Order order) {
-        orderRepository.addOrder(order);
+        orderRepository.save(order);
     }
 
     public Order getOrderById(long id) {
-        return orderRepository.getOrderById(id);
+        return orderRepository.findById(id);
     }
 
     public List<Order> getAllOrders() {
-        return orderRepository.getAllOrders();
+        return orderRepository.findAll();
     }
 
     public void deleteOrder(long id) {
-        orderRepository.deleteOrder(id);
+        orderRepository.delete(id);
     }
 }

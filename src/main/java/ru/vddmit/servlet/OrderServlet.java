@@ -3,6 +3,7 @@ package ru.vddmit.servlet;
 import com.google.gson.Gson;
 import ru.vddmit.model.Order;
 import ru.vddmit.service.OrderService;
+import ru.vddmit.utils.ServletUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,20 +16,12 @@ import java.util.List;
 
 @WebServlet("/order")
 public class OrderServlet extends HttpServlet {
-    private OrderService orderService;
     private final Gson gson = new Gson();
 
     @Override
-    public void init() throws ServletException {
-        orderService = (OrderService) getServletContext().getAttribute("orderService");
-
-        if (orderService == null) {
-            throw new ServletException("OrderService not found in ServletContext");
-        }
-    }
-
-    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        OrderService orderService = ServletUtils.getServiceFromContext(getServletContext(), "orderService", OrderService.class);
+
         resp.setContentType("application/json");
         String idParam = req.getParameter("id");
 
@@ -51,6 +44,8 @@ public class OrderServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        OrderService orderService = ServletUtils.getServiceFromContext(getServletContext(), "orderService", OrderService.class);
+
         resp.setContentType("application/json");
         BufferedReader reader = req.getReader();
         Order order = gson.fromJson(reader, Order.class);
@@ -67,6 +62,8 @@ public class OrderServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        OrderService orderService = ServletUtils.getServiceFromContext(getServletContext(), "orderService", OrderService.class);
+
         String idParam = req.getParameter("id");
 
         if (idParam != null) {

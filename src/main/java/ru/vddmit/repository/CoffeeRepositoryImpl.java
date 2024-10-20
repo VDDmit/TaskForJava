@@ -12,7 +12,7 @@ public class CoffeeRepositoryImpl implements CoffeeRepository {
     private final Connection connection;
 
     @Override
-    public void addCoffee(Coffee coffee) {
+    public void save(Coffee coffee) {
         String sql = "INSERT INTO coffee (name, price) VALUES (?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, coffee.getName());
@@ -24,7 +24,32 @@ public class CoffeeRepositoryImpl implements CoffeeRepository {
     }
 
     @Override
-    public Coffee getCoffeeById(long id) {
+    public void update(Coffee coffee) {
+        String sql = "UPDATE coffee SET name = ?, price = ? WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, coffee.getName());
+            preparedStatement.setDouble(2, coffee.getPrice());
+            preparedStatement.setLong(3, coffee.getId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Update failed", e);
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
+        String sql = "DELETE FROM coffee WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Delete coffee with id = " + id + " failed", e);
+        }
+    }
+
+
+    @Override
+    public Coffee findById(Long id) {
         String sql = "SELECT * FROM coffee WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
@@ -39,7 +64,7 @@ public class CoffeeRepositoryImpl implements CoffeeRepository {
     }
 
     @Override
-    public List<Coffee> getAllCoffees() {
+    public List<Coffee> findAll() {
         List<Coffee> coffees = new ArrayList<>();
         String sql = "SELECT * FROM coffee";
         try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
@@ -52,28 +77,5 @@ public class CoffeeRepositoryImpl implements CoffeeRepository {
         return coffees;
     }
 
-    @Override
-    public void updateCoffee(Coffee coffee) {
-        String sql = "UPDATE coffee SET name = ?, price = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, coffee.getName());
-            preparedStatement.setDouble(2, coffee.getPrice());
-            preparedStatement.setLong(3, coffee.getId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Update failed", e);
-        }
-    }
 
-    @Override
-    public void deleteCoffee(long id) {
-        String sql = "DELETE FROM coffee WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, id);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Delete coffee with id = " + id + " failed", e);
-        }
-        ;
-    }
 }

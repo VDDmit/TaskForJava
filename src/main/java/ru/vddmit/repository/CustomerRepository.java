@@ -2,16 +2,11 @@ package ru.vddmit.repository;
 
 import ru.vddmit.model.Customer;
 
-import java.util.List;
 
-public interface CustomerRepository {
-    void save(Customer customer);
+public interface CustomerRepository extends CrudRepository<Customer> {
 
     void deleteByEmail(String email);
 
-    Customer findById(long id);
-
     Customer findByEmail(String email);
 
-    List<Customer> findAll();
 }

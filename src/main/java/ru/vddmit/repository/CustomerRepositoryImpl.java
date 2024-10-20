@@ -37,7 +37,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     @Override
-    public Customer findById(long id) {
+    public Customer findById(Long id) {
         String sql = "SELECT * FROM customer WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
